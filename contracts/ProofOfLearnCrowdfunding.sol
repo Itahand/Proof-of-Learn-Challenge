@@ -41,15 +41,44 @@ contract ProofOfLearnCrowdFunding {
     event Refund(uint256 id, address indexed caller, uint256 amount);
     event Launch(
         uint256 id,
-        address indexed creator,
+        address indexed proposer,
         uint256 goal,
         uint32 startAt,
-        uint32 endAt
+        uint64 endAt
     );
 
     ///// Constructor /////
     constructor(address _token, uint256 _maxDuration) {
         token = IERC20(_token);
         maxDuration = _maxDuration;
+    }
+
+    ///// Functions /////
+    function launch(
+        uint256 _goal,
+        uint32 _startAt,
+        uint64 _endAt
+    ) external {
+        /*         require(
+            _startAt >= block.timestamp,
+            "Start time is invalid: must be higher than current Block Timestamp"
+        ); */
+        require(_endAt > _startAt, "Start time must be lower than End time");
+        require(
+            _endAt <= block.timestamp + maxDuration,
+            "End time exceeds the maximum Duration"
+        );
+
+        count += 1;
+        campaigns[count] = Campaign({
+            proposer: msg.sender,
+            goal: _goal,
+            pledged: 0,
+            startAt: _startAt,
+            endAt: _endAt,
+            claimed: false
+        });
+
+        emit Launch(count, msg.sender, _goal, _startAt, _endAt);
     }
 }
