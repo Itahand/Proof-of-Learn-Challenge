@@ -19,7 +19,11 @@ describe("Proof of Learn Crowdfunding Challenge", () => {
     const Token = await ethers.getContractFactory("Token");
 
     testToken = await Token.deploy("Noah", "NOAH", "1000000");
-    crowdfunding = await ProofOfLearnCrowdfunding.deploy(testToken.address);
+    // Deploying with the Noah token address and 100 as maximum duration
+    crowdfunding = await ProofOfLearnCrowdfunding.deploy(
+      testToken.address,
+      100
+    );
 
     accounts = await ethers.getSigners();
     deployer = accounts[0];
@@ -30,6 +34,9 @@ describe("Proof of Learn Crowdfunding Challenge", () => {
   describe("Deployment", () => {
     it("Uses correct Noah token address", async () => {
       expect(await crowdfunding.token()).to.equal(testToken.address);
+    });
+    it("Reflects the correct number value for the max duration", async () => {
+      expect(await crowdfunding.maxDuration()).to.equal(100);
     });
   });
 });

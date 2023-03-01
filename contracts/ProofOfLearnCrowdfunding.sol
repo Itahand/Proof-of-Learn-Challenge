@@ -16,9 +16,23 @@ interface IERC20 {
  */
 
 contract ProofOfLearnCrowdFunding {
-    IERC20 public immutable token;
+    struct Campaign {
+        address proposer;
+        uint256 goal;
+        uint256 pledged;
+        uint256 startAt;
+        uint256 endAt;
+        bool claimed;
+    }
 
-    constructor(address _token) {
+    IERC20 public immutable token;
+    uint256 public count;
+    uint256 public maxDuration;
+    mapping(uint256 => Campaign) public campaigns;
+    mapping(uint256 => mapping(address => uint256)) public pledgedAmount;
+
+    constructor(address _token, uint256 _maxDuration) {
         token = IERC20(_token);
+        maxDuration = _maxDuration;
     }
 }
