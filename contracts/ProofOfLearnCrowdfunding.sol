@@ -11,11 +11,19 @@ interface IERC20 {
     ) external returns (bool);
 }
 
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
 /**
  * @title Proof of Learn Crowdfunding Smart Contract Solidity Challenge
  */
 
-contract ProofOfLearnCrowdFunding {
+contract ProofOfLearnCrowdFunding is
+    Initializable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
     ///// Contract variables /////
     IERC20 public immutable token;
     uint256 public count;
@@ -51,9 +59,22 @@ contract ProofOfLearnCrowdFunding {
     constructor(address _token, uint256 _maxDuration) {
         token = IERC20(_token);
         maxDuration = _maxDuration;
+        _disableInitializers();
     }
 
-    ///// Functions /////
+    // Upgradable Functionality //
+    function initialize() public initializer {
+        __Ownable_init();
+        __UUPSUpgradeable_init();
+    }
+
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        override
+        onlyOwner
+    {}
+
+    ///// Campaign Functionality /////
     function launch(
         uint256 _goal,
         uint32 _startAt,
