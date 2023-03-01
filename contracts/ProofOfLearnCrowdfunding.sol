@@ -93,8 +93,46 @@ contract ProofOfLearnCrowdFunding {
             block.timestamp < campaign.startAt,
             "Campaign has already started"
         );
-
         delete campaigns[_id];
         emit Cancel(_id);
+    }
+
+    function pledge(uint256 _id, uint256 _amount) external {
+        Campaign storage campaign = campaigns[_id];
+        require(
+            block.timestamp >= campaign.startAt,
+            "Campaign has not Started yet"
+        );
+        require(
+            block.timestamp <= campaign.endAt,
+            "Campaign has already ended"
+        );
+        campaign.pledged += _amount;
+        pledgedAmount[_id][msg.sender] += _amount;
+        token.transferFrom(msg.sender, address(this), _amount);
+
+        emit Pledge(_id, msg.sender, _amount);
+    }
+
+    function unPledge(uint256 _id, uint256 _amount) external {
+        Campaign storage campaign = campaigns[_id];
+        require(
+            block.timestamp >= campaign.startAt,
+            "Campaign has not Started yet"
+        );
+        require(
+            block.timestamp <= campaign.endAt,
+            "Campaign has already ended"
+        );
+        require(
+            pledgedAmount[_id][msg.sender] >= _amount,
+            "You do not have enough tokens Pledged to withraw"
+        );
+
+        campaign.pledged -= _amount;
+        pledgedAmount[_id][msg.sender] -= _amount;
+        token.transfer(msg.sender, _amount);
+
+        emit Unpledge(_id, msg.sender, _amount);
     }
 }

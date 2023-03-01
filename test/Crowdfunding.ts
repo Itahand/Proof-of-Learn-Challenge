@@ -8,7 +8,7 @@ const tokens = (n: number) => {
 };
 
 describe("Proof of Learn Crowdfunding Challenge", () => {
-  let deployer,
+  let deployer: any,
     user1: any,
     user2: any,
     testToken: any,
@@ -73,6 +73,22 @@ describe("Proof of Learn Crowdfunding Challenge", () => {
       expect(args.goal).to.equal(goal);
       expect(args.startAt).to.equal(startTime);
       expect(args.endAt).to.equal(endTime);
+    });
+
+    describe("Cancel", () => {
+      it("Can't cancel when the campaign has started", async () => {
+        expect(crowdfunding.connect(user1).cancel(1)).to.be.reverted;
+      });
+      it("Can't cancel when is another address attempts to cancel", async () => {
+        expect(crowdfunding.connect(user2).cancel(1)).to.be.reverted;
+      });
+    });
+
+    describe("Funding", () => {
+      it("A user successfully funds a campaign", async () => {
+        expect(crowdfunding.connect(deployer).pledge(1, 100)).to.not.be
+          .reverted;
+      });
     });
 
     describe("Failure", () => {
