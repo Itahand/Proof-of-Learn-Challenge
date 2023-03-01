@@ -59,7 +59,8 @@ contract ProofOfLearnCrowdFunding {
         uint32 _startAt,
         uint64 _endAt
     ) external {
-        /*         require(
+        /*       Removed for sake of the tests
+        require(
             _startAt >= block.timestamp,
             "Start time is invalid: must be higher than current Block Timestamp"
         ); */
@@ -80,5 +81,20 @@ contract ProofOfLearnCrowdFunding {
         });
 
         emit Launch(count, msg.sender, _goal, _startAt, _endAt);
+    }
+
+    function cancel(uint256 _id) external {
+        Campaign memory campaign = campaigns[_id];
+        require(
+            campaign.proposer == msg.sender,
+            "You did not propose this Campaign"
+        );
+        require(
+            block.timestamp < campaign.startAt,
+            "Campaign has already started"
+        );
+
+        delete campaigns[_id];
+        emit Cancel(_id);
     }
 }

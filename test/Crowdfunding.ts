@@ -47,8 +47,8 @@ describe("Proof of Learn Crowdfunding Challenge", () => {
   describe("Functionality", () => {
     let transaction, result: any;
     let goal = 1000;
-    let endTime = 2000;
-    let startTime = 100;
+    let endTime = 200000;
+    let startTime = 100000;
 
     beforeEach(async () => {
       // Deposit token
