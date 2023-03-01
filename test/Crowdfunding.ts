@@ -63,7 +63,12 @@ describe("Proof of Learn Crowdfunding Challenge", () => {
       expect(await result.proposer).to.equal(user1.address);
     });
 
-    it("Emits a Launch event", async () => {
+    it("Reflects the campaign funding goal", async () => {
+      let result = await crowdfunding.campaigns(1);
+      expect(await result.goal).to.equal(goal);
+    });
+
+    it("Emits a Launch event with all correct arguments", async () => {
       const event = result.events[0];
       expect(event.event).to.equal("Launch");
 
@@ -84,10 +89,16 @@ describe("Proof of Learn Crowdfunding Challenge", () => {
       });
     });
 
-    describe("Funding", () => {
+    describe("Funding", async () => {
       it("A user successfully funds a campaign", async () => {
         expect(crowdfunding.connect(deployer).pledge(1, 100)).to.not.be
           .reverted;
+      });
+    });
+
+    describe("Refund", () => {
+      it("A user successfully gets their refund after failed campaign", async () => {
+        expect(crowdfunding.connect(deployer).refund(1)).to.not.be.reverted;
       });
     });
 

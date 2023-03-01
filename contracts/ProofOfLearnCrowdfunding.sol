@@ -135,4 +135,35 @@ contract ProofOfLearnCrowdFunding {
 
         emit Unpledge(_id, msg.sender, _amount);
     }
+
+    function claim(uint256 _id) external {
+        Campaign storage campaign = campaigns[_id];
+        require(
+            campaign.proposer == msg.sender,
+            "You did not create this Campaign"
+        );
+        require(block.timestamp > campaign.endAt, "Campaign has not ended");
+        require(campaign.pledged >= campaign.goal, "Campaign did not succed");
+        require(!campaign.claimed, "claimed");
+
+        campaign.claimed = true;
+        token.transfer(campaign.proposer, campaign.pledged);
+
+        emit Claim(_id);
+    }
+
+    function refund(uint256 _id) external {
+        Campaign memory campaign = campaigns[_id];
+        require(block.timestamp > campaign.endAt, "not ended");
+        require(
+            campaign.pledged < campaign.goal,
+            "You cannot Withdraw, Campaign has succeeded"
+        );
+
+        uint256 bal = pledgedAmount[_id][msg.sender];
+        pledgedAmount[_id][msg.sender] = 0;
+        token.transfer(msg.sender, bal);
+
+        emit Refund(_id, msg.sender, bal);
+    }
 }
